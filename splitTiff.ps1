@@ -8,9 +8,9 @@ $saveFileDialog = New-Object System.Windows.Forms.SaveFileDialog
 #$image.Save($saveFile, $imageFormat::jpeg)
 foreach ($a in $args){
     $saveFileDialog.FileName = ''
-    $saveFileDialog.title = "Output files for $a"
+    $saveFileDialog.title = "$a Output to.."
     $saveFileDialog.initialDirectory = split-path $a
-    $saveFileDialog.ShowDialog()
+    $saveFileDialog.ShowDialog() | Out-Null
     $outfile_pre = $saveFileDialog.FileName
     if ($outfile_pre -ne ''){
         $image = [drawing.image]::FromFile($a)
@@ -20,5 +20,8 @@ foreach ($a in $args){
             $image.Save($outfile_pre + '_' + $i + '.tif')
             Write-Host "File write ${outfile_pre}_${i}.tif"
         }
+    } else {
+        Write-Host "$a not processed; No output selected."
     }
 }
+Read-Host 'done'
