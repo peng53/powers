@@ -8,7 +8,7 @@ $myImageCodecInfo = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders()|
 $c = $img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page)
 for ($i = 0; $i -lt $c; $i++){
     $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $i) | out-null
-    $img.Save('r:/lzw_' + $i + '.tif')
+    $img.Save('r:/lzw_' + $i + '.tif', $myImageCodecInfo, $($encoderParams))
 }
 #$img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $i) | out-null
 #$img.save('R:\testsave.tif',$myImageCodecInfo,$($encoderParams))
