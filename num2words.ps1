@@ -1,16 +1,16 @@
-﻿$smallNum = '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
-$tensScale = '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'
-$places = '', '', 'Thousand', 'Million', 'Billion', 'Trillion'
+﻿# https://support.microsoft.com/en-us/office/convert-numbers-into-words-a0d166fb-e1ea-4090-95c8-69442cd55d98
 
 function GetTens {
     [CmdLetBinding()]
     param(
         [int]$t
     )
+    $tensScale = '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'
+    $smallNum = '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
     if ($t -lt 20){
         return $smallNum[$t]
     } else {
-        return $tensScale[[math]::floor($t/10)] +' '+ $smallNum[$t%10]
+        return ($tensScale[[math]::floor($t/10)] +' '+ $smallNum[$t%10]).trim()
     }
 }
 function GetHundreds {
@@ -24,7 +24,7 @@ function GetHundreds {
     $h = $h.PadLeft(3,'0')
     $result = ''
     if ($h[0] -ne '0'){
-        $result = $smallNum[[math]::floor([int]$h/100)] + ' Hundred'
+        $result = (GetTens([math]::floor([int]$h/100))) + ' Hundred'
     }
     $result = $result + ' '+ (GetTens($h.Substring(1,2)))
     return $result
@@ -34,6 +34,7 @@ function Num2Words {
     param(
         [float]$n
     )
+    $places = '', '', 'Thousand', 'Million', 'Billion', 'Trillion'
     $mynum = [string]$n
     $dollar = ''
     $cents = ''
@@ -58,12 +59,12 @@ function Num2Words {
             $dollar = $temp + ' ' + $places[$count+1]+' ' + $dollar
         }
     }
-    $dollar = switch ($dollar){
+    $dollar = switch ($dollar.trim()){
         '' {'No Dollars'}
         'One' {'One Dollar'}
         default { $dollar + 'Dollars'}
     }
-    $cents = switch ($cents){
+    $cents = switch ($cents.trim()){
         '' {' and No Cents'}
         'One' {' and One Cent'}
         default {' and '+$cents+' Cents'}
