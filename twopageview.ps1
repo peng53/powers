@@ -34,10 +34,10 @@ $form.controls.add($layout)
 $img = [drawing.image]::FromFile($file)
 
 $leftI = 0
-$pb_left.image = $img.GetThumbnailImage($pb_left.width,$pb_left.Width,$null,0)
+$pb_left.image = $img.GetThumbnailImage($pb_left.width,$pb_left.height,$null,0)
 if ($img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page) -gt 1){
     $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 1) | out-null
-    $pb_right.image = $img.GetThumbnailImage($pb_right.width,$pb_right.Width,$null,0)
+    $pb_right.image = $img.GetThumbnailImage($pb_right.width,$pb_right.height,$null,0)
 }
 
 
@@ -51,14 +51,14 @@ $form.add_Closed({
 })
 
 $form.add_Resize({
-$pb_left.image.dispose()
-$pb_right.image.dispose()
-$img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 0) | out-null
-$pb_left.image = $img.GetThumbnailImage($pb_left.width,$pb_left.Width,$null,0)
-if ($img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page) -gt 1){
-    $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 1) | out-null
-    $pb_right.image = $img.GetThumbnailImage($pb_right.width,$pb_right.Width,$null,0)
-}
+    $pb_left.image.dispose()
+    $pb_right.image.dispose()
+    $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 0) | out-null
+    $pb_left.image = $img.GetThumbnailImage($pb_left.width,$pb_left.height,$null,0)
+    if ($img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page) -gt 1){
+        $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 1) | out-null
+        $pb_right.image = $img.GetThumbnailImage($pb_right.width,$pb_right.height,$null,0)
+    }
 })
 
 $form.showdialog()
