@@ -11,10 +11,8 @@ $layout.RowStyles.Add((new-object 'System.Windows.Forms.RowStyle' ('Absolute', 2
 
 $pb_left = New-Object 'system.windows.forms.picturebox'
 $pb_right = New-Object 'system.windows.forms.picturebox'
-
+$pb_left.sizemode = $pb_right.sizemode = 'zoom'
 $layout.dock = $pb_left.dock = $pb_right.dock= 'fill'
-
-$file = 'r:\multilzw.tif'
 
 function FormKeyDown {
   [CmdletBinding()] 
@@ -31,34 +29,24 @@ $layout.controls.add($pb_left)
 $layout.controls.add($pb_right)
 $form.controls.add($layout)
 
+$file = 'r:\3layer.tif'
 $img = [drawing.image]::FromFile($file)
+$imgR = $img.clone()
 
-$leftI = 0
-$pb_left.image = $img.GetThumbnailImage($pb_left.width,$pb_left.height,$null,0)
-if ($img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page) -gt 1){
-    $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 1) | out-null
-    $pb_right.image = $img.GetThumbnailImage($pb_right.width,$pb_right.height,$null,0)
+
+$img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 0) | out-null
+$pb_left.image = $img
+$pb_right.image = $imgR
+if ($imgR.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page) -gt 1){
+    $imgR.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 1) | out-null
 }
-
 
 $form.add_Closed({
     $img.dispose()
-    $pb_left.image.dispose()
-    $pb_right.image.dispose()
+    $imgR.dispose()
     $layout.dispose()
     $form.dispose()
     write-host Job Done
-})
-
-$form.add_Resize({
-    $pb_left.image.dispose()
-    $pb_right.image.dispose()
-    $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 0) | out-null
-    $pb_left.image = $img.GetThumbnailImage($pb_left.width,$pb_left.height,$null,0)
-    if ($img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page) -gt 1){
-        $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, 1) | out-null
-        $pb_right.image = $img.GetThumbnailImage($pb_right.width,$pb_right.height,$null,0)
-    }
 })
 
 $form.showdialog()
