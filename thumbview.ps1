@@ -1,9 +1,7 @@
 ﻿Add-Type -AssemblyName 'System.WIndows.Forms'
 
-$form = New-Object 'system.windows.forms.form' -Property @{width=1200;height=600;text='thumbview.ps1'}
-$layout = New-Object 'system.windows.forms.tablelayoutpanel' -Property @{dock='fill';columncount=2;rowcount=2;}
-$layout.ColumnStyles.Add((new-object 'system.windows.forms.columnstyle' ('Percent',100))) | out-null
-$layout.ColumnStyles.Add((new-object 'system.windows.forms.columnstyle' ('Absolute',400))) | out-null
+$form = New-Object 'system.windows.forms.form' -Property @{width=800;height=600;text='thumbview.ps1'}
+$layout = New-Object 'system.windows.forms.tablelayoutpanel' -Property @{dock='fill';columncount=1;rowcount=2;}
 $layout.RowStyles.Add((new-object 'system.windows.forms.rowstyle' ('Absolute',30))) | out-null
 $layout.RowStyles.Add((new-object 'system.windows.forms.rowstyle' ('Percent',100))) | out-null
 
@@ -18,9 +16,8 @@ $buttons.Items.Add((new-object 'system.windows.forms.toolstripseparator')) | Out
 $numcb = New-Object 'System.Windows.Forms.ToolStripCombobox' ('Select')
 $buttons.Items.Add($numcb) | Out-Null
 $buttons.Items.Add((new-object 'system.windows.forms.toolstripseparator')) | Out-Null
-$layoutMode = New-Object 'System.Windows.Forms.ToolStripButton' ('Expand Preview') -Property @{CheckOnClick=$true}
-$buttons.Items.Add($layoutMode) | Out-Null
 
+$split = new-object 'system.windows.forms.splitcontainer' -Property @{Dock='fill'}
 
 $listv = New-Object 'system.windows.forms.listview' -Property @{checkboxes=$true;dock='fill'}
 $listv.Columns.Add("Item Column", -2) | out-null
@@ -43,21 +40,12 @@ $picbox = new-object 'system.windows.forms.picturebox' -Property @{SizeMode='Zoo
 $picbox.Image = $img
 
 $layout.controls.Add($buttons)
-$layout.setcolumnspan($buttons,2)
-$layout.controls.Add($listv)
-$layout.controls.Add($picbox)
+$layout.controls.Add($split)
+$split.panel1.controls.Add($listv)
+$split.panel2.controls.Add($picbox)
+$split.splitterdistance = 200
 
 $form.controls.Add($layout)
-
-$layoutMode.Add_Click({
-    if ($layoutMode.Checked){
-        $layout.ColumnStyles[0] = new-object 'system.windows.forms.columnstyle' ('Absolute',200)
-        $layout.ColumnStyles[1] = new-object 'system.windows.forms.columnstyle' ('Percent',100)
-    } else {
-        $layout.ColumnStyles[0] = new-object 'system.windows.forms.columnstyle' ('Percent',100)
-        $layout.ColumnStyles[1] = new-object 'system.windows.forms.columnstyle' ('Absolute',400)
-    }
-})
 
 $listv.Add_selectedindexchanged({
     $img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $listv.SelectedIndices[0])
@@ -65,11 +53,11 @@ $listv.Add_selectedindexchanged({
 })
 
 $form.Add_Closed({
-    #$buttons.Items | foreach-object {$_.dispose()}
-    #$listv.Items | foreach-object {$_.dispose()}
     $img.Dispose()
     $imglist.Images | foreach-object {$_.dispose()}
     $imglist.Dispose()
+    $listv.dispose()
+    $picbox.dispose()
     $layout.Controls | foreach-object {$_.Dispose()}
     $layout.Dispose()
     $form.Dispose()
