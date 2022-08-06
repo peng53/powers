@@ -1,4 +1,5 @@
-﻿Add-Type -AssemblyName System.Windows.Forms
+﻿#Requires -Version 4.0
+Add-Type -AssemblyName System.Windows.Forms
 
 $form = New-Object system.windows.forms.form -Property @{width=800;height=600;text='thumbview.ps1'}
 $layout = New-Object system.windows.forms.tablelayoutpanel -Property @{dock='fill';columncount=1;rowcount=2;}
@@ -33,42 +34,40 @@ $split.panel2.controls.Add($picbox)
 $openfiledialog = new-object System.Windows.Forms.OpenFileDialog -Property @{Filter='tif File|*.tif;*.tiff'}
 $img = $null
 
-$openImageButton.Add_Click({
-if ($openfiledialog.ShowDialog() -eq 'OK'){
-    $listv.Enabled = $false
-    foreach ($item in $listv.SelectedItems){
-        $item.Selected = $false
-    }
-    if ($script:img){
-        $script:img.Dispose()
-        foreach ($i in ($listv.Items.Count-1)..0){
-            $listv.Items.RemoveAt($i)
-            $listv.LargeImageList.Images[$i].Dispose()
+Function LoadImg($lv,$pb){
+    if ($openfiledialog.ShowDialog() -eq 'OK'){
+        $lv.Enabled = $false
+        if ($script:img){
+            $script:img.Dispose()
+            $lv.LargeImageList.Images.Clear()
         }
-        $listv.Items.Clear()
-        $listv.LargeImageList.Images.Clear()
+        $script:img = [drawing.bitmap]::FromFile($openfiledialog.FileName)
+        $c = $script:img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page)-1
+        foreach ($i in 0..$c){
+            $script:img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $i) | out-null
+            $listv.LargeImageList.Images.Add($script:img.GetThumbnailImage(64,64,$null,0)) | out-null
+            if ($lv.Items.Count -le $i){
+                $t = 'Page {0}' -f $i
+                $lv.Items.Add((new-object 'system.windows.forms.ListViewItem' ($t, $i))) | Out-Null
+            }
+        }
+        $pb.Image = $script:img
+        while ($lv.Items.Count -gt $c+1){
+            $lv.Items.RemoveAt($lv.Items.Count-1)
+        }
+        $lv.Enabled = $true
     }
-    $script:img = [drawing.bitmap]::FromFile($openfiledialog.FileName)
-    $c = $script:img.GetFrameCount([System.Drawing.Imaging.FrameDimension]::Page)-1
-    foreach ($i in 0..$c){
-        $script:img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $i) | out-null
-        $listv.LargeImageList.Images.Add($script:img.GetThumbnailImage(64,64,$null,0)) | out-null
-        $t = 'Page {0}' -f $i
-        $listv.Items.Add((new-object 'system.windows.forms.ListViewItem' ($t, $i))) | Out-Null
-    }
-    $picbox.Image = $script:img
-    $listv.Enabled = $true
 }
-})
-$listv.Add_selectedindexchanged({
-    if ($listv.Items.Count -gt 0){
-        $script:img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $listv.SelectedIndices[0])
-        $picbox.Image = $script:img
-    }
-})
+$openImageButton.Add_Click({LoadImg $listv $picbox})
 
-#$form.Add_Closed({
-#})
+Function LV_RowClick($s,$p){
+    if ($s.SelectedIndices.Count -gt 0){
+        $script:img.SelectActiveFrame([System.Drawing.Imaging.FrameDimension]::Page, $s.SelectedIndices[0])
+        $p.Image = $script:img
+    }
+}
+$listv.Add_selectedindexchanged({LV_RowClick $this $picbox})
+
 try {
     $form.ShowDialog() | Out-Null
 }
@@ -76,21 +75,18 @@ catch {
     Write-Error $_
 }
 finally {
-    $img.Dispose()
-    foreach ($i in ($listv.LargeImageList.Count-1)..0){
-        $listv.LargeImageList[$i].Dispose()
+    if ($img){
+        $img.Dispose()
     }
-    foreach ($i in ($buttons.Items.Count-1)..0){
-        $buttons.Items.RemoveAt($i)
-    }
-    $buttons.items.clear()
+    $listv.LargeImageList.Images.Clear()
+    $buttons.Items.Clear()
     $buttons.dispose()
     $listv.dispose()
     $picbox.dispose()
     $split.dispose()
-
     $layout.Dispose()
     $form.Dispose()
     $openfiledialog.Dispose()
     write-host Cleanup!
 }
+pause
