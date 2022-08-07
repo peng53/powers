@@ -1,0 +1,69 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="750" Height="500" Title="wpf_xaml.ps1">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="5" />
+            <RowDefinition MinHeight="105" />
+        </Grid.RowDefinitions>
+        <ToolBarTray HorizontalAlignment="Left" Height="28" Grid.Row="0" VerticalAlignment="Top">
+            <ToolBar HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Button Name="TestButton" Content="Button1" />
+                <Button Name="TestButton2" Content="Button2" />
+                <Label Content="Name" Height="23" VerticalAlignment="Top"/>
+                <TextBox Height="23" Margin="0" TextWrapping="Wrap" Text="[namehere]" VerticalAlignment="Top" Width="120"/>
+            </ToolBar>
+        </ToolBarTray>
+        <ListView Name="listv" Grid.Row="1">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Ref" Width="120" DisplayMemberBinding="{Binding Path=Id}"/>
+                    <GridViewColumn Header="Type" Width="100" DisplayMemberBinding="{Binding Path=Membership}"/>
+                    <GridViewColumn Header="Front" Width="250" DisplayMemberBinding="{Binding Path=FirstName}"/>
+                    <GridViewColumn Header="Back" Width="250" DisplayMemberBinding="{Binding Path=LastName}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" />
+        <TabControl Grid.Row="3">
+            <TabItem Header="Param" Margin="0">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Id">
+                        <TextBox Height="23" Margin="10,10,13,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1" Header="FirstName">
+                        <TextBox Height="23" Margin="10,10,23,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
+                    </GroupBox>
+                    <GroupBox Grid.Column="2" Header="LastName">
+                        <TextBox Height="23" Margin="10,10,9,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
+                    </GroupBox>
+                    <StackPanel Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1">
+                        <Button Name="CreateRow" HorizontalAlignment="Center" Content="Create" Grid.Row="1" Width="75"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Output">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Name="PrintButton" HorizontalAlignment="Left" Content="Print" Grid.Row="1" Width="75"/>
+                    <TextBox Name="OutputArea" Grid.Row="0" TextWrapping="Wrap" Text="TextBox" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window> 
