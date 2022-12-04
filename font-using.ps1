@@ -9,20 +9,30 @@ $pfc.AddFontFile('R:\GnuMICR.ttf')
 $font = [system.drawing.font]::new($pfc.Families[0], 16)
 
 
-$form = [form]@{width=800;height=600;text='font-using.ps1';AllowDrop='true'}
+$form = [form]@{width=500;height=400;text='font-using.ps1';AllowDrop='true'}
 $layout = [tablelayoutpanel]@{dock='fill';columncount=1;rowcount=2}
 $buttons = [toolstrip]::new()
-$textbox = [toolstriptextbox]@{font=$font;width=500}
-$buttons.Items.Add($textbox)
+$textbox = [toolstriptextbox]@{font=$font}
+[void]$buttons.Items.Add([toolstriplabel]::new('Text'))
+[void]$buttons.Items.Add($textbox)
+$xposTb = [toolstriptextbox]@{Width=50;AutoSize=$false}
+$yposTb = [toolstriptextbox]@{Width=50;AutoSize=$false}
+
+[void]$buttons.Items.Add([toolstriplabel]::new('X'))
+[void]$buttons.Items.Add($xposTb)
+[void]$buttons.Items.Add([toolstriplabel]::new('Y'))
+[void]$buttons.Items.Add($yposTb)
+
+
 $imprintButton = [toolstripbutton]::new('Imprint')
-$buttons.Items.Add($imprintButton)
+[void]$buttons.Items.Add($imprintButton)
 $saveButton = [toolstripbutton]::new('Save')
-$buttons.Items.Add($saveButton)
+[void]$buttons.Items.Add($saveButton)
 [void]$form.controls.Add($layout)
 [void]$layout.RowStyles.Add([rowstyle]::new('Absolute',$buttons.Height))
 [void]$layout.RowStyles.Add([rowstyle]::new('Percent',100))
 [void]$layout.controls.Add($buttons)
-$picbox = [picturebox]@{SizeMode='CenterImage';Dock='fill';AllowDrop='true'}
+$picbox = [picturebox]@{SizeMode='Normal';Dock='fill';AllowDrop='true'}
 [void]$layout.controls.Add($picbox)
 
 
@@ -39,7 +49,14 @@ $brush.dispose()
 Function Imprint($bmp, $t){
     $g = [system.drawing.graphics]::fromimage($bmp)
     $brush = [System.Drawing.SolidBrush]::new('black')
-    $g.drawstring($t,$font,$brush,5,5)
+    $x = $y = 5
+    if ($xposTb.Text.Length -match '^\d+$'){
+        $x = [Math]::Max([Math]::Min([int]$xposTb.Text,400),0)
+    }
+    if ($yposTb.Text.Length -match '^\d+$'){
+        $y = [Math]::Max([Math]::Min([int]$yposTb.Text,300),0)
+    }
+    $g.drawstring($t,$font,$brush,$x,$y)
     $brush.dispose()
     $picbox.refresh()
 }
@@ -73,7 +90,14 @@ Function SaveAsFile(){
 
 $saveButton.Add_Click({SaveAsFile})
 
-$form.showdialog()
+Function SetPosition($ev){
+    $xposTb.Text = $ev.X
+    $yposTb.Text = $ev.Y
+}
+
+$picbox.Add_Click({SetPosition($_)})
+
+[void]$form.showdialog()
 
 
 
