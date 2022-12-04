@@ -4,10 +4,10 @@ Add-Type -AssemblyName 'System.Windows.Forms'
 add-type -AssemblyName 'system.drawing'
 
 $pfc = [System.Drawing.Text.PrivateFontCollection]::new()
-$pfc.AddFontFile('R:\GnuMICR.ttf')
+#$pfc.AddFontFile('R:\GnuMICR.ttf')
 #$font = [system.drawing.font]::new($pfc.Families[0].Name, 24, "Regular", "Pixel")
-$font = [system.drawing.font]::new($pfc.Families[0], 16)
-
+#$font = [system.drawing.font]::new($pfc.Families[0], 16)
+$script:font = [system.drawing.font]::new('Arial', 16)
 
 $form = [form]@{width=500;height=400;text='font-using.ps1';AllowDrop='true'}
 $layout = [tablelayoutpanel]@{dock='fill';columncount=1;rowcount=2}
@@ -56,7 +56,7 @@ Function Imprint($bmp, $t){
     if ($yposTb.Text.Length -match '^\d+$'){
         $y = [Math]::Max([Math]::Min([int]$yposTb.Text,300),0)
     }
-    $g.drawstring($t,$font,$brush,$x,$y)
+    $g.drawstring($t,$script:font,$brush,$x,$y)
     $brush.dispose()
     $picbox.refresh()
 }
@@ -97,15 +97,34 @@ Function SetPosition($ev){
 
 $picbox.Add_Click({SetPosition($_)})
 
+$openfiledialog = [openfiledialog]@{filter='Font ttf|*.ttf'}
+
+Function SetCustomFont(){
+    if ($openfiledialog.showDialog() -eq 'OK'){
+        $pfc.dispose()
+        $pfc = [System.Drawing.Text.PrivateFontCollection]::new()
+        $pfc.AddFontFile($openfiledialog.filename)
+        $script:font.dispose()
+        $script:font = [system.drawing.font]::new($pfc.Families[0].Name, 24)
+        #$script:font = [system.drawing.font]::new($pfc.Families[0].Name, 24, "Regular", "Pixel")
+    }
+}
+
+$setFontButton = [toolstripbutton]::new('Load Font')
+[void]$buttons.Items.Add($setFontButton)
+
+$setFontButton.Add_Click({SetCustomFont})
+
 [void]$form.showdialog()
 
 
-
+$pfc.dispose()
 $bmp.dispose()
 $layout.dispose()
 $picbox.dispose()
 $buttons.dispose()
-$font.dispose()
+$script:font.dispose()
 $form.dispose()
 $textbox.dispose()
 $savefiledialog.dispose()
+$openfiledialog.dispose()
