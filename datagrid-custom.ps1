@@ -7,6 +7,7 @@ Add-Type -AssemblyName PresentationFramework
 class DataItem {
     [string]$Filename
     [string]$Meta
+    [string]$Type
     [bool]$First
     [bool]$IsSelected
 }
@@ -19,12 +20,12 @@ $dg.ItemsSource = $items
 #$items.Add([DataItem]::new('r:/test.png'))
 #$items.Add([DataItem]@{Filename='r:/test1.png'})
 #$items.Add([DataItem]::new('r:/test1.png'))
-$items.Add([DataItem]@{Filename='r:/test1.png';First=$true;Meta='1234'})
+$items.Add([DataItem]@{Filename='r:/test1.png';First=$true;Meta='1234';Type='A'})
 $testb = $Form.FindName('TestButton')
 $testb.Add_Click({
     for ($i=0;$i -lt $items.Count;$i++){
         if ($items[$i].IsSelected){
-            write-host $items[$i].Filename
+            write-host $items[$i].Filename $items[$i].Meta $items[$i].First $items[$i].Type
         }
     }
 })

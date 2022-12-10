@@ -61,13 +61,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Type" Width="100">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ComboBox SelectedValue="{Binding Path=Type}" ItemsSource="{StaticResource ComboBoxItems}" Height="24" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Path=Type}" ItemsSource="{StaticResource ComboBoxItems}" />
                     <DataGridTextColumn Header="Meta" Width="300" Binding="{Binding Path=Meta}" />
                 </DataGrid.Columns>
             </DataGrid>
