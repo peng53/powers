@@ -8,6 +8,7 @@ class DataItem {
     [string]$Filename
     [string]$Meta
     [bool]$First
+    [bool]$IsSelected
 }
 
 [xml]$XAML = Get-Content datagrid-custom.xaml
@@ -19,5 +20,24 @@ $dg.ItemsSource = $items
 #$items.Add([DataItem]@{Filename='r:/test1.png'})
 #$items.Add([DataItem]::new('r:/test1.png'))
 $items.Add([DataItem]@{Filename='r:/test1.png';First=$true;Meta='1234'})
+$testb = $Form.FindName('TestButton')
+$testb.Add_Click({
+    for ($i=0;$i -lt $items.Count;$i++){
+        if ($items[$i].IsSelected){
+            write-host $items[$i].Filename
+        }
+    }
+})
+$previewimg = $Form.FindName('PreviewImg')
+$dg.Add_CurrentCellChanged({
+    #write-host $_
+    #write-host $_.CurrentCell.RowNumber;
+    $x = $dg.CurrentItem 
+    if ($x -and $x.Filename.Length -gt 0 -and (Test-Path $x.Filename)){
+        $previewimg.Source = $x.Filename
+    }
+    
+})
+
 [void]$Form.ShowDialog()
-pause
+#pause

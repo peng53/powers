@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:thumbnail_grid" xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="dlpsxaml" Height="Auto" Width="Auto" MinHeight="200" MinWidth="600">
-    <Grid>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <Grid.Resources>
             <x:Array x:Key="ComboBoxItems" Type="sys:String">
                 <sys:String>A</sys:String>
@@ -11,32 +11,77 @@
                 <sys:String>C</sys:String>
             </x:Array>
         </Grid.Resources>
-        <DataGrid AutoGenerateColumns="False" Name="Datagrid1">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Thumbnail">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image Width="64" Height="64" Source="{Binding Path=Filename}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Path=Filename}"/>
-                <DataGridTemplateColumn Header="First">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding Path=First,Mode=TwoWay}" Height="24" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Type" Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ComboBox SelectedValue="{Binding Path=Type}" ItemsSource="{StaticResource ComboBoxItems}" Height="24" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Meta" Width="300" Binding="{Binding Path=Meta}" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ToolBarTray HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Grid.Row="0">
+            <ToolBar HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Button Name="TestButton">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Z" FontFamily="Wingdings"/>
+                        <Label Content="TestButton"/>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+            <ToolBar HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="P" FontFamily="Wingdings"/>
+                        <Label Content="Toolbar2"/>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DataGrid AutoGenerateColumns="False" Name="Datagrid1" Grid.Column="0" Width="Auto">
+                <DataGrid.ItemContainerStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                    </Style>
+                </DataGrid.ItemContainerStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Thumbnail" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Width="64" Height="64" Source="{Binding Path=Filename}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Path=Filename}"/>
+                    <DataGridTemplateColumn Header="First">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Path=First,Mode=TwoWay}" Height="24" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Type" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox SelectedValue="{Binding Path=Type}" ItemsSource="{StaticResource ComboBoxItems}" Height="24" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Meta" Width="300" Binding="{Binding Path=Meta}" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <GridSplitter Width="5" Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" />
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Image Source="C:\Users\lm\Pictures\before_crash.png" Grid.Row="0" Name="PreviewImg"/>
+                <GridSplitter Height="5" Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                <TextBox Grid.Row="2" Name="TestText" />
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
