@@ -44,6 +44,18 @@
                                 <Label Content="Remove" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+                        <Button Name="MoveUpButton" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Ù" FontFamily="Wingdings" FontSize="15" />
+                                <Label Content="Move Up"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Name="MoveDownButton" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Ú" FontFamily="Wingdings" FontSize="15" />
+                                <Label Content="Move Down"/>
+                            </StackPanel>
+                        </Button>
                         <Button Name="TestButton">
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="Z" FontFamily="Wingdings"/>

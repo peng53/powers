@@ -21,8 +21,13 @@ $dg.ItemsSource = $items
 #$items.Add([DataItem]@{Filename='r:/test1.png'})
 #$items.Add([DataItem]::new('r:/test1.png'))
 #$items.Add([DataItem]@{Filename='r:/test1.png';First=$true;Meta='1234';Type='A'})
+$l = 30
 foreach ($f in (Get-ChildItem C:\Users\lm\Pictures\*.png)){
     $items.Add([DataItem]@{Filename=$f})
+    $l--
+    if ($l -le 1){
+        break
+    }
 }
 $testb = $Form.FindName('TestButton')
 $testb.Add_Click({
@@ -69,6 +74,39 @@ $dg.Add_CurrentCellChanged({
     }
     
 })
+
+Function ItemMoveDown($dg,$items){
+    if ($dg.SelectedItem){
+        $dg.IsEnabled = $false
+        $dg.ItemsSource = $null
+        for ($i=$items.Count-2;$i -ge 0;$i--){
+            if ($items[$i].IsSelected){
+                $items[$i].IsSelected = $false
+                $items.Move($i,$i+1)
+            }
+        }
+        $dg.ItemsSource = $items
+        $dg.IsEnabled = $true
+    }
+}
+Function ItemMoveUp($dg,$items){
+    if ($dg.SelectedItem){
+        $dg.IsEnabled = $false
+        $dg.ItemsSource = $null
+        for ($i=1;$i -lt $items.Count; $i++){
+            if ($items[$i].IsSelected){
+                $items[$i].IsSelected = $false
+                $items.Move($i,$i-1)
+            }
+        }
+        $dg.ItemsSource = $items
+        $dg.IsEnabled = $true
+    }
+}
+
+
+$Form.FindName('MoveDownButton').Add_Click({ItemMoveDown $dg $items})
+$Form.FindName('MoveUpButton').Add_Click({ItemMoveUp $dg $items})
 
 [void]$Form.ShowDialog()
 #pause
