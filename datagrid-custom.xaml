@@ -18,7 +18,7 @@
             </x:Array>
         </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="64"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="*" MinHeight="25"/>
         </Grid.RowDefinitions>
@@ -83,14 +83,14 @@
                             </Style>
                         </DataGrid.ItemContainerStyle>
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Thumbnail" IsReadOnly="True">
+                            <DataGridTemplateColumn Header="Thumbnail" IsReadOnly="True" CanUserSort="False">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Image Width="64" Height="64" Source="{Binding Path=Filename}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Path=Filename}"/>
+                            <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Path=Filename}" CanUserSort="False"/>
                             <DataGridTemplateColumn Header="First" Width="50">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -98,14 +98,14 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Type" Width="100">
+                            <DataGridTemplateColumn Header="Type" Width="100" CanUserSort="False">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox SelectedValue="{Binding Path=Type}" ItemsSource="{StaticResource ComboBoxItems}" Height="24" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Meta" Width="300" Binding="{Binding Path=Meta}" />
+                            <DataGridTextColumn Header="Meta" Width="300" Binding="{Binding Path=Meta}" CanUserSort="False"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
