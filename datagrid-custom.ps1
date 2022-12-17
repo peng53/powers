@@ -17,10 +17,6 @@ $Form=[Windows.Markup.XamlReader]::Load([System.Xml.XmlNodeReader]::new($XAML))
 $dg = $Form.FindName('Datagrid1')
 $items = [System.Collections.ObjectModel.ObservableCollection[DataItem]]::new()
 $dg.ItemsSource = $items
-#$items.Add([DataItem]::new('r:/test.png'))
-#$items.Add([DataItem]@{Filename='r:/test1.png'})
-#$items.Add([DataItem]::new('r:/test1.png'))
-#$items.Add([DataItem]@{Filename='r:/test1.png';First=$true;Meta='1234';Type='A'})
 $l = 30
 foreach ($f in (Get-ChildItem C:\Users\lm\Pictures\*.png)){
     $items.Add([DataItem]@{Filename=$f;Meta=$l})
@@ -49,26 +45,10 @@ $gridmode.Add_Click({
             $dg.SelectionUnit = [System.Windows.Controls.DataGridSelectionUnit]::Cell
         }
     }
-    <#
-    if ($dg.SelectionUnit -eq [System.Windows.Controls.DataGridSelectionUnit]::Cell){
-        $dg.SelectionUnit = [System.Windows.Controls.DataGridSelectionUnit]::FullRow
-    } else {
-        $dg.SelectionUnit = [System.Windows.Controls.DataGridSelectionUnit]::Cell
-    }#>
 })
-<#
-$dg.Add_BeginningEdit({
-    $dg.SelectionUnit = [System.Windows.Controls.DataGridSelectionUnit]::Cell
-})
-$dg.Add_CellEditEnding({
-    $dg.SelectionUnit = [System.Windows.Controls.DataGridSelectionUnit]::FullRow
-})
-#>
+
 $previewimg = $Form.FindName('PreviewImg')
-#$dg.Add_CurrentCellChanged({
 $dg.Add_CurrentCellChanged({
-    #write-host $_
-    #write-host $_.CurrentCell.RowNumber;
     $x = $dg.CurrentItem 
     if ($x -and $x.Filename.Length -gt 0 -and (Test-Path $x.Filename)){
         $previewimg.Source = $x.Filename
@@ -78,62 +58,62 @@ $dg.Add_CurrentCellChanged({
 
 $script:indexStack = [system.collections.generic.stack[int]]::new()
 
-Function ItemMove($diff){
+
+Function ItemsDo($dg, $items, $action){
+    $dg.ItemsSource = $null
     while ($script:indexStack.Count -gt 0){
-        $i = $script:indexStack.pop()
-        $items.Move($i,$i+$diff)
-    }
-}
-
-Function ItemMoveDown($dg,$items){
-    $dg.IsEnabled = $false
-    if ($dg.SelectedItem){
-        $l = $items.Count-1
-        for ($i=0;$i -lt $l; $i++){
-            if ($items[$i].IsSelected){
-                $script:indexStack.Push($i)
+        $i = $script:indexStack.Pop()
+        switch ($action){
+            SetA { $items[$i].Type = 'A'}
+            SetB { $items[$i].Type = 'B'}
+            SetC { $items[$i].Type = 'C'}
+            CheckFirst { $items[$i].First = -not $items[$i].First}
+            ClearMeta { $items[$i].Meta = ''}
+            Delete { $items.RemoveAt($i) }
+            MoveDown { 
+                if ($i -le $items.Count){
+                    $items.Move($i,$i+1)
+                }
+            }
+            MoveUp {
+                if ($i -gt 0){
+                    $items.Move($i,$i-1)
+                }
             }
         }
-        $dg.ItemsSource = $null
-        ItemMove 1
-        $dg.ItemsSource = $items
     }
-    $dg.IsEnabled = $true
-}
-Function ItemMoveUp($dg,$items){
-    $dg.IsEnabled = $false
-    if ($dg.SelectedItem){
-        $dg.ItemsSource = $null
-        for ($i=$items.Count-1; $i -gt 0; $i--){
-            if ($items[$i].IsSelected){
-                $script:indexStack.Push($i)
-            }
-        }
-        ItemMove -1
-        $dg.ItemsSource = $items
-    }
-    $dg.IsEnabled = $true
+    $dg.ItemsSource = $items
 }
 
-
-$Form.FindName('MoveDownButton').Add_Click({ItemMoveDown $dg $items})
-$Form.FindName('MoveUpButton').Add_Click({ItemMoveUp $dg $items})
-
-$Form.FindName('RmButton').Add_Click({
+Function ReverseSelectedAction($dg, $items, $action){
     if ($dg.SelectedItem){
-        $c = $dg.SelectedItems.Count
         $dg.IsEnabled = $false
-        $dg.ItemsSource = $null
-        for ($i=$items.Count-1; ($c -gt 0 -and $i -ge 0); $i--){
+        for ($i=$items.Count-1; $i -ge 0; $i--){
             if ($items[$i].IsSelected){
-                $items.RemoveAt($i)
-                $c--
+                $script:indexStack.Push($i)
             }
         }
-        $dg.ItemsSource = $items
+        ItemsDo $dg $items $action
         $dg.IsEnabled = $true
     }
-})
+}
+
+Function SelectedAction($dg, $items, $action){
+    if ($dg.SelectedItem){
+        $dg.IsEnabled = $false
+        for ($i=0; $i -lt $items.Count; $i++){
+            if ($items[$i].IsSelected){
+                $script:indexStack.Push($i)
+            }
+        }
+        ItemsDo $dg $items $action
+        $dg.IsEnabled = $true
+    }
+}
+
+$Form.FindName('MoveUpButton').Add_Click({ReverseSelectedAction $dg $items 'MoveUp'})
+$Form.FindName('MoveDownButton').Add_Click({SelectedAction $dg $items 'MoveDown'})
+$Form.FindName('RmButton').Add_Click({ SelectedAction $dg $items 'Delete'})
 
 [void]$Form.ShowDialog()
 #pause
