@@ -1,8 +1,8 @@
 ﻿<Window 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:thumbnail_grid" xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Title="dlpsxaml" Height="640" Width="600">
+        xmlns:local="clr-namespace:datagrid_custom" xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="datagrid-custom" Height="640" Width="600">
     <Grid>
         <Grid.Resources>
             <x:Array x:Key="ComboBoxItems" Type="sys:String">
@@ -91,10 +91,10 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Path=Filename}" CanUserSort="False"/>
+                            <DataGridTextColumn Header="Filename" Width="*" Binding="{Binding Path=Filename}" CanUserSort="False"/>
                             <DataGridCheckBoxColumn Header="First" Binding="{Binding Path=First, Mode=TwoWay}" />
                             <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Path=Type}" ItemsSource="{StaticResource ComboBoxItems}" />
-                            <DataGridTextColumn Header="Meta" Width="300" Binding="{Binding Path=Meta}" CanUserSort="False"/>
+                            <DataGridTextColumn Header="Meta" Width="2*" Binding="{Binding Path=Meta}" CanUserSort="False"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -104,21 +104,24 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
-                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <ToolBar Height="25" Grid.ColumnSpan="3"/>
-                    <GroupBox Header="Val1" Grid.Row="1" Grid.Column="0">
-                        <TextBox Text="TextBox" Name="TestText"/>
+                    <ToolBar Height="36" Grid.ColumnSpan="2">
+                        <Button Name="LoadRowsButton">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="4" FontFamily="Wingdings" FontSize="15"/>
+                                <Label Content="LoadRows" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </ToolBar>
+                    <GroupBox Header="Filename" Grid.Row="1" Grid.Column="0">
+                        <TextBox Name="FilenameTextBox"/>
                     </GroupBox>
-                    <GroupBox Header="Val2" Grid.Row="1" Grid.Column="1">
-                        <TextBox Text="TextBox"/>
-                    </GroupBox>
-                    <GroupBox Header="Val3" Grid.Row="1" Grid.Column="2">
-                        <TextBox Text="TextBox"/>
+                    <GroupBox Header="Meta" Grid.Row="1" Grid.Column="1">
+                        <TextBox Name="MetaTextBox"/>
                     </GroupBox>
                 </Grid>
             </TabItem>

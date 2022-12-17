@@ -17,6 +17,7 @@ $Form=[Windows.Markup.XamlReader]::Load([System.Xml.XmlNodeReader]::new($XAML))
 $dg = $Form.FindName('Datagrid1')
 $items = [System.Collections.ObjectModel.ObservableCollection[DataItem]]::new()
 $dg.ItemsSource = $items
+<#
 $l = 30
 foreach ($f in (Get-ChildItem C:\Users\lm\Pictures\*.png)){
     $items.Add([DataItem]@{Filename=$f;Meta=$l})
@@ -25,6 +26,7 @@ foreach ($f in (Get-ChildItem C:\Users\lm\Pictures\*.png)){
         break
     }
 }
+#>
 $testb = $Form.FindName('TestButton')
 $testb.Add_Click({
     $dg.CancelEdit()
@@ -121,6 +123,39 @@ $qscb = $Form.FindName('QuickSetCb')
 $Form.FindName('QuickSetButton').Add_Click({
     $op = $qscb.SelectedValue -replace ' ', ''
     SelectedAction $dg $items $op
+})
+
+$ofd = [Microsoft.Win32.OpenFileDialog]@{MultiSelect=$true;Filter='Image File|*.jpg;*.jpeg;*.png;*.bmp;*.tif;*.tiff'}
+$Form.FindName('AddButton').Add_Click({
+    if ($ofd.ShowDialog()){
+        $dg.IsEnabled = $false
+        $dg.ItemsSource = $null
+        foreach ($f in $ofd.Filenames){
+            $items.Add([DataItem]@{Filename=$f})
+        }
+        $dg.ItemsSource = $items
+        $dg.IsEnabled = $true
+    }
+})
+
+$fntb = $Form.FindName('FilenameTextBox')
+$mttb = $Form.FindName('MetaTextBox')
+
+$sb = [System.Text.StringBuilder]::new()
+
+$Form.FindName('LoadRowsButton').Add_Click({
+    for ($i=0;$i -lt $items.Count;$i++){
+        [void]$sb.Append($items[$i].Filename)
+        [void]$sb.Append([System.Environment]::NewLine)
+    }
+    $fntb.Text = $sb.ToString()
+    $sb.Clear()
+    for ($i=0;$i -lt $items.Count;$i++){
+        [void]$sb.Append($items[$i].Meta)
+        [void]$sb.Append([System.Environment]::NewLine)
+    }
+    $mttb.Text = $sb.ToString()
+    $sb.Clear()
 })
 
 [void]$Form.ShowDialog()
