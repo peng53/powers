@@ -15,6 +15,7 @@
                 <sys:String>Set B</sys:String>
                 <sys:String>Set C</sys:String>
                 <sys:String>Check First</sys:String>
+                <sys:String>Clear Meta</sys:String>
             </x:Array>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -68,13 +69,13 @@
                                 <Label Content="CellEditMode"/>
                             </StackPanel>
                         </ToggleButton>
-                        <Button VerticalAlignment="Center">
+                        <Button Name="QuickSetButton" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="O" FontFamily="Wingdings" FontSize="15" />
                                 <Label Content="Quick"/>
                             </StackPanel>
                         </Button>
-                        <ComboBox VerticalAlignment="Center" ItemsSource="{StaticResource QuickSet}" Width="60"/>
+                        <ComboBox Name="QuickSetCb" VerticalAlignment="Center" ItemsSource="{StaticResource QuickSet}" Width="60"/>
                     </ToolBar>
                     <DataGrid Grid.Row="1" Name="Datagrid1" AutoGenerateColumns="False">
                         <DataGrid.ItemContainerStyle>

@@ -52,6 +52,7 @@ $dg.Add_CurrentCellChanged({
     $x = $dg.CurrentItem 
     if ($x -and $x.Filename.Length -gt 0 -and (Test-Path $x.Filename)){
         $previewimg.Source = $x.Filename
+        $dg.CommitEdit()
     }
     
 })
@@ -114,6 +115,13 @@ Function SelectedAction($dg, $items, $action){
 $Form.FindName('MoveUpButton').Add_Click({ReverseSelectedAction $dg $items 'MoveUp'})
 $Form.FindName('MoveDownButton').Add_Click({SelectedAction $dg $items 'MoveDown'})
 $Form.FindName('RmButton').Add_Click({ SelectedAction $dg $items 'Delete'})
+$qscb = $Form.FindName('QuickSetCb')
+
+
+$Form.FindName('QuickSetButton').Add_Click({
+    $op = $qscb.SelectedValue -replace ' ', ''
+    SelectedAction $dg $items $op
+})
 
 [void]$Form.ShowDialog()
 #pause
