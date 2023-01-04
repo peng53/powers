@@ -1,7 +1,7 @@
 ﻿#Requires -Version 7
 add-type -AssemblyName 'system.drawing'
 
-$jsonData = convertfrom-json ((Get-Content test_zones.json) -split '`n' -join '') -ashashtable
+$jsonData = convertfrom-json ((Get-Content $PSScriptroot\etc\test_zones.json) -split '`n' -join '') -ashashtable
 
 $fonts = [System.Collections.Generic.Dictionary[[string],[system.drawing.font]]]::new()
 foreach ($z in $jsonData.zones.GetEnumerator()){

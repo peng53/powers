@@ -1,0 +1,41 @@
+{
+	"zones": {
+		"0": {
+			"x": 50,
+			"y": 16,
+			"fontSize": 24,
+			"font": "Arial",
+			"fontStyle": "Bold",
+			"alignment": "left"
+		},
+		"1": {
+			"x": 1600,
+			"y": 16,
+			"fontSize": 24,
+			"font": "Arial",
+			"fontStyle": "Regular",
+			"alignment": "right"
+		},
+		"name": {
+			"x": 100,
+			"y": 400,
+			"fontSize": 24,
+			"font":"Arial",
+			"fontStyle": "Regular",
+			"alignment": "left"
+		}
+	},
+	"width": 1700,
+	"height": 600,
+	"pages": {
+		"a":{
+			"0":["Test","Value","Other"],
+			"1":[500,100,3000.12],
+			"name": "Page A"
+		},
+		"b":{
+			"0":["Test2","ValueXYZ","OtherXCV"],
+			"1":[1500,2100,30.12]
+		}
+	}
+}
