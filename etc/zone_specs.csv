@@ -1,0 +1,5 @@
+Name,x,y,fontSize,font,fontStyle,alignment
+EmployeeNo,50,16,24,Arial,Regular,left
+FirstName,250,16,24,Arial,Regular,left
+LastName,450,16,24,Arial,Italic,left
+Wage,1000,16,24,Arial,Bold,right

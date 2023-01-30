@@ -1,59 +1,47 @@
 ﻿#Requires -Version 7
 add-type -AssemblyName 'system.drawing'
 
+
+
 $data = import-csv $PSScriptRoot\etc\test_zones.csv
-
-$zones = @{
-    'EmployeeNo' = @{
-        x = 50
-        y = 16
-        fontSize = 24
-        font = 'Arial'
-        fontStyle = 'Regular'
-        alignment = 'left'
-    }
-    'FirstName' = @{
-        x = 250
-        y = 16
-        fontSize = 24
-        font = 'Arial'
-        fontStyle = 'Regular'
-        alignment = 'left'
-    }
-    'LastName' = @{
-        x = 450
-        y = 16
-        fontSize = 24
-        font = 'Arial'
-        fontStyle = 'Regular'
-        alignment = 'left'
-    }
-    'Wage' = @{
-        x = 1000
-        y = 16
-        fontSize = 24
-        font = 'Arial'
-        fontStyle = 'Bold'
-        alignment = 'right'
-    }
+$specData = import-csv $PSScriptRoot\etc\zone_specs.csv
+$styles = @{
+    Regular = [System.Drawing.FontStyle]::Regular
+    Bold = [System.Drawing.FontStyle]::Bold
+    Italic = [System.Drawing.FontStyle]::Italic
 }
-$fonts = [System.Collections.Generic.Dictionary[[string],[system.drawing.font]]]::new()
 
-foreach ($z in $zones.GetEnumerator()){
-    $font,$size,$style = $z.value['font','fontSize','fontStyle']
-    $name = "$font-$size-$style"
-    $st = [System.Drawing.FontStyle]::Regular
-    switch ($style){
+$fonts = [System.Collections.Generic.Dictionary[[string],[system.drawing.font]]]::new()
+$zones = @{}
+
+foreach ($row in $specData){
+    
+    $name = '{0}-{1}-{2}' -f $row.font,$row.fontSize,$row.fontStyle
+    $st = $styles.Regular
+    if ($styles.Containskey($row.fontStyle)){
+        $st = $styles[$row.fontStyle]
+    }
+    <#
+    switch ($row.style){
         'Regular' { $st = [System.Drawing.FontStyle]::Regular }
         'Bold' { $st = [System.Drawing.FontStyle]::Bold }
-        'Italic' { [System.Drawing.FontStyle]::Italic }
+        'Italic' { $st =[System.Drawing.FontStyle]::Italic }
+    }#>
+    if ($row.font -and -not $fonts.ContainsKey($name)){
+        $fonts.Add($name, [system.drawing.font]::new($row.font,[int]$row.fontSize ?? 12, $st,[system.drawing.graphicsunit]::Point))
     }
-    if ($font -and -not $fonts.ContainsKey($name)){
-        $fonts.Add($name, [system.drawing.font]::new($font,[int]$size ?? 12, $st,[system.drawing.graphicsunit]::Point))
+    $zones[$row.Name] = @{
+        x = [int]$row.x
+        y = [int]$row.y
+        fontSize = [int]$row.fontSize
+        font = $row.font
+        fontStyle = $row.fontStyle
+        alignment = $row.alignment
+        vfont = $name
     }
 }
 
-$width = 1700
+$width = 1000
 $height = 600
 $cols = @{}
 
@@ -73,6 +61,7 @@ $stringformat = [system.drawing.stringformat]::new()
 foreach ($row in $data){
     if ($row.Page -ne $page){
         if ($image){
+            write-host 'saving' $page
             $image.save('r:/page_{0}.png' -f $page)
             $g.dispose()
             $image.dispose()
@@ -82,24 +71,25 @@ foreach ($row in $data){
         $page = $row.Page
         $print_row = 0
     }
+    #write-host $row
     foreach ($k in $cols.Keys){
         #write-host $k $row.$k $print_row
 
         $zone = $zones[$k]
-        $fontName = '{0}-{1}-{2}' -f $zone.font,$zone.fontSize,$zone.fontStyle
-        $font = $fonts[$fontName]
-        $pt = [system.drawing.pointf]::new($zone.x,$zone.y+(($font.Height+2)*$print_row))
+        $font = $fonts[$zone.vfont]
+        $pt = [system.drawing.pointf]::new($zone.x,$zone.y)
+        $pt.y += ($font.Height+2)*$print_row
         switch ($zone.alignment){
             'center' { $stringformat.alignment = 'Center' }
             'left' { $stringformat.alignment = 'Near' }
             'right' { $stringformat.alignment = 'Far' }
         }
-
         $g.DrawString($row.$k,$font,$brushBlack,$pt,$stringformat)
     }
     $print_row++
 }
 if ($image){
+    write-host 'saving' $page
     $image.save('r:/page_{0}.png' -f $page)
     $g.dispose()
     $image.dispose()
