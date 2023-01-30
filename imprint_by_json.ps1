@@ -12,7 +12,7 @@ foreach ($z in $jsonData.zones.GetEnumerator()){
     switch ($style){
         'Regular' { $st = [System.Drawing.FontStyle]::Regular }
         'Bold' { $st = [System.Drawing.FontStyle]::Bold }
-        'Italic' { [System.Drawing.FontStyle]::Italic }
+        'Italic' { $st = [System.Drawing.FontStyle]::Italic }
     }
     if ($font -and -not $fonts.ContainsKey($name)){
         $fonts.Add($name, [system.drawing.font]::new($font,[int]$size ?? 12, $st,[system.drawing.graphicsunit]::Point))
