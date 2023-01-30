@@ -19,7 +19,7 @@ foreach ($z in $jsonData.zones.GetEnumerator()){
     }
 }
 write-host $fonts
-$brushBlack = [System.Drawing.SolidBrush]::new('black')
+$mainBrush = [system.drawing.brushes]::black
 foreach ($p in $jsonData.pages.GetEnumerator()){
     write-host 'create image of size' $jsonData.width 'x' $jsonData.height
     $image = [system.drawing.bitmap]::new([int]$jsonData.width,[int]$jsonData.height)
@@ -38,8 +38,8 @@ foreach ($p in $jsonData.pages.GetEnumerator()){
             'right' { $stringformat.alignment = 'Far' }
         }
         foreach ($v in $zv){
-            $g.DrawString($v,$font,$brushBlack,$pt,$stringformat)
-            write-host 'draw string' $v 'with font' $font $brushBlack $rec
+            $g.DrawString($v,$font,$mainBrush,$pt,$stringformat)
+            write-host 'draw string' $v 'with font' $font $mainBrush $pt
             $pt.y += $font.Height+2
 
         }
@@ -48,5 +48,3 @@ foreach ($p in $jsonData.pages.GetEnumerator()){
     $g.dispose()
     $image.dispose()
 }
-
-$brushBlack.dispose()

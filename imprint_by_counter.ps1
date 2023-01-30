@@ -5,6 +5,8 @@ $width = 1000
 $height = 600
 $templateImgPath = 'r:/template.png'
 $templateImg = $null
+#$mainBrush = [system.drawing.brushes]::blue
+$mainBrush = [system.drawing.systembrushes]::WindowText
 
 if ($templateImgPath -and (test-path $templateImgPath)){
     $templateImg =[system.drawing.image]::fromfile($templateImgPath)
@@ -28,6 +30,11 @@ foreach ($row in $specData){
         }
         $fonts.Add($name, [system.drawing.font]::new($row.font,[int]$row.fontSize ?? 12, $st,[system.drawing.graphicsunit]::Point))
     }
+    $color = 'black'
+    if ($row.color){
+        $color = $row.color
+        write-host $color $row.color
+    }
     $zones[$row.Name] = @{
         x = [int]$row.x
         y = [int]$row.y
@@ -36,6 +43,7 @@ foreach ($row in $specData){
         fontStyle = $row.fontStyle
         alignment = $row.alignment
         vfont = $name
+        color = [system.drawing.brushes]::$color
     }
 }
 ## below command will 'zones' section for json
@@ -49,7 +57,7 @@ foreach ($kv in $data[0].PSObject.properties){
 }
 $page = $null
 $print_row = 0
-$brushBlack = [System.Drawing.SolidBrush]::new('black')
+
 $image = $null
 $g = $null
 $stringformat = [system.drawing.stringformat]::new()
@@ -81,7 +89,7 @@ foreach ($row in $data){
             'left' { $stringformat.alignment = 'Near' }
             'right' { $stringformat.alignment = 'Far' }
         }
-        $g.DrawString($row.$k,$font,$brushBlack,$pt,$stringformat)
+        $g.DrawString($row.$k,$font,$zone.color,$pt,$stringformat)
     }
     $print_row++
 }
@@ -92,17 +100,12 @@ if ($image){
     $image.dispose()
 }
 
-$brushBlack.dispose()
+$t = $fonts.keys
+foreach ($k in $t){
+    $fonts[$k].Dispose()
+}
+$fonts.Clear()
 
-$stk = [System.Collections.Generic.Stack[string]]::new()
-foreach ($k in $fonts.keys){
-    [void]$stk.push($k)
-}
-while ($stk.count -gt 0){
-    $x = $stk.pop()
-    $fonts[$x].dispose()
-    [void]$fonts.Remove($x)
-}
 if ($templateImg){
     $templateImg.dispose()
 }
