@@ -5,8 +5,7 @@ $width = 1000
 $height = 600
 $templateImgPath = 'r:/template.png'
 $templateImg = $null
-#$mainBrush = [system.drawing.brushes]::blue
-$mainBrush = [system.drawing.systembrushes]::WindowText
+$bgCol= [system.drawing.brushes]::White
 
 if ($templateImgPath -and (test-path $templateImgPath)){
     $templateImg =[system.drawing.image]::fromfile($templateImgPath)
@@ -30,11 +29,7 @@ foreach ($row in $specData){
         }
         $fonts.Add($name, [system.drawing.font]::new($row.font,[int]$row.fontSize ?? 12, $st,[system.drawing.graphicsunit]::Point))
     }
-    $color = 'black'
-    if ($row.color){
-        $color = $row.color
-        write-host $color $row.color
-    }
+    $color = $row.color ?? 'black'
     $zones[$row.Name] = @{
         x = [int]$row.x
         y = [int]$row.y
@@ -76,6 +71,9 @@ foreach ($row in $data){
             $image = [system.drawing.bitmap]::new($width,$height)
         }
         $g = [System.Drawing.Graphics]::FromImage($image) 
+        if ($templateImg){
+            $g.FillRectangle($bgCol, [system.drawing.rectangle]::new(0,0,$templateImg.width,$templateImg.height))
+        }
         $page = $row.Page
         $print_row = 0
     }
