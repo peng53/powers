@@ -1,6 +1,6 @@
 ﻿$header = 'Group','Key','Stat1','Stat2','Stat3'
-$a = import-csv 'keyed_csv.csv' -header $header
-$b = import-csv 'keyed_csv_b.csv' -header $header
+$data_l = import-csv $PSScriptRoot/etc/keyed_csv.csv -header $header
+$data_r = import-csv $PSScriptRoot/etc/keyed_csv_b.csv -header $header
 
 $outcsv = join-path r: difference_csv.txt
 if ((test-path $outcsv)){
@@ -8,45 +8,45 @@ if ((test-path $outcsv)){
     $outcsv = $null
 }
 
-'Group,Key,Difference' >> $outcsv
+'Group,Key,Difference,Left,Right' >> $outcsv
 
-$a_keyed = @{}
-$a_keys = [System.Collections.Generic.HashSet[string]]::new()
-for ($i=0; $i -lt $a.Count; $i++){
-    $row = $a[$i]
-    if (-not $a_keyed.ContainsKey([int]$row.Group)){
-        $a_keyed[[int]$row.Group] = @{}
-    }
-    $a_keyed[[int]$row.Group][[int]$row.Key] = $row
-    # group or key can be a string, just remove [int] casting
-    [void]$a_keys.Add('{0}-{1}' -f ($row.Group,$row.Key))
-}
-
-$b_keyed = @{}
-$b_keys = [System.Collections.Generic.HashSet[string]]::new()
-for ($i=0; $i -lt $b.Count; $i++){
-    $row = $b[$i]
-    if (-not $b_keyed.ContainsKey([int]$row.Group)){
-        $b_keyed[[int]$row.Group] = @{}
-    }
-    $b_keyed[[int]$row.Group][[int]$row.Key] = $row
-    # group or key can be a string, just remove [int] casting
-    $k = '{0}-{1}' -f ($row.Group,$row.Key)
-    [void]$b_keys.Add($k)
-    if (-not $a_keys.Contains($k)){
-        write-host 'Missing' $k 'in A' -BackgroundColor Magenta
-        '{0},{1},Missing A' -f ($row.Group,$row.Key) >> $outcsv
+$dictL = [system.collections.generic.dictionary[string,int]]::new()
+for ($i=0;$i -lt $data_l.Count;$i++){
+    $row = $data_l[$i]
+    $key = '{0}-{1}' -f $row.Group,$row.Key
+    if (-not $dictL.ContainsKey($key)){
+        $dictL.Add($key,$i)
+    } else {
+        write-host 'Error: key not unique, L row' $i
     }
 }
-
-foreach ($k in $a_keys){
-    if (-not $b_keys.Contains($k)){
-        write-host 'Missing' $k 'in B' -BackgroundColor Green
-        '{0},{1},Missing B' -f ($k.Split('-')) >> $outcsv
+$dictR = [system.collections.generic.dictionary[string,int]]::new()
+for ($i=0;$i -lt $data_r.Count;$i++){
+    $row = $data_r[$i]
+    $key = '{0}-{1}' -f $row.Group,$row.Key
+    if (-not $dictR.ContainsKey($key)){
+        $dictR.Add($key,$i)
+    } else {
+        write-host 'Error: key not unique, R row' $i
+    }
+    if (-not $dictL.ContainsKey($key)){
+        write-host 'Missing' $key 'in LEFT' -BackgroundColor Magenta
+        '{0},{1},Missing LEFT,,' -f ($row.Group,$row.Key) >> $outcsv
     }
 }
-$shared = [System.Collections.Generic.HashSet[string]]::new($a_keys)
-$shared.IntersectWith($b_keys)
+$keysL = [System.Collections.Generic.HashSet[string]]::new($dictL.Keys)
+$keysR = [System.Collections.Generic.HashSet[string]]::new($dictR.Keys)
+
+foreach ($k in $keysL){
+    if (-not $keysR.Contains($k)){
+        write-host 'Missing' $k 'in RIGHT' -BackgroundColor Green
+        '{0},{1},Missing B,,' -f ($k.Split('-')) >> $outcsv
+    }
+}
+
+
+$shared = [System.Collections.Generic.HashSet[string]]::new($keysL)
+$shared.IntersectWith($keysR)
 
 $diffCols = 'Stat1','Stat2','Stat3'
 Function DiffRow($group,$key,$l,$r){
@@ -54,7 +54,7 @@ Function DiffRow($group,$key,$l,$r){
     foreach ($c in $diffCols){
         if ($l.$c -ne $r.$c){
             write-host $group '-' $key '* Mismatch' $c ':' $l.$c '!=' $r.$c -BackgroundColor red
-            '{0},{1},{2}' -f ($group,$key,$c) >> $outcsv
+            '{0},{1},{2},{3},{4}' -f ($group,$key,$c,$l.$c,$r.$c) >> $outcsv
             $ret = 1
         }
     }
@@ -63,6 +63,6 @@ Function DiffRow($group,$key,$l,$r){
 
 foreach ($k in $shared){
     [int]$group,[int]$key = $k.Split('-')
-    DiffRow -group $group -key $key -l $a_keyed[$group][$key] -r $b_keyed[$group][$key] | Out-Null
+    DiffRow -group $group -key $key -l $data_l[$dictL[$k]] -r $data_r[$dictR[$k]] | Out-Null
 }
 Invoke-item $outcsv
