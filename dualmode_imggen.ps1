@@ -11,7 +11,7 @@ $allSpecs = import-csv $psscriptroot/etc/zone_specs_dual.csv
 $data = import-csv $psscriptroot/etc/test_zones_dual.csv
 # data should have Filename column and all other columns should be in the spec to be captured on file
 # getting cols start
-$ignoreCols = 'Filename'
+$ignoreCols = 'Filename,Width,Height'
 $dataCols = $data[0].psobject.Properties.Name | Where-Object {$ignoreCols -notcontains $_}
 $drawCols = [System.Collections.Generic.Dictionary[string,pscustomobject]]::new()
 $fonts = [System.Collections.Generic.Dictionary[[string],[system.drawing.font]]]::new()
@@ -25,9 +25,9 @@ foreach ($row in $allSpecs){
         $drawCols.Add($row.Name, $row)
         $font = '{0}|{1}|{2}' -f $row.font,$row.fontSize,$row.fontStyle
         if (-not $fonts.containskey($font)){
-            $st = $styles.Regular
+            $st = [System.Drawing.FontStyle]::Regular
             if ($styles.Containskey($row.fontStyle)){
-                $st = $styles[$row.fontStyle]
+                $st = [System.Drawing.FontStyle]$row.fontStyle
             }
             $fonts.Add($font, [system.drawing.font]::new($row.Font,[int]$row.fontSize, $st,[system.drawing.graphicsunit]::Point))
         }
@@ -68,6 +68,10 @@ foreach ($row in $data){
     $frame = $null
     $g = $null
     if ($template -eq $null){
+        if ($row.width -and $row.height){
+            $width = [int]$row.width
+            $height = [int]$row.height
+        }
         if ($width -gt 0 -and $height -gt 0){
             $frame = [system.drawing.bitmap]::new($width,$height)
             # create blank (white) canvas
