@@ -2,8 +2,6 @@
 add-type -AssemblyName 'system.drawing'
 add-type -AssemblyName 'system.windows.forms'
 
-$f = [system.drawing.font]::new('Arial',12)
-
 #getting specs
 # specs should be csv with header
 # Name,x0,y0,fontSize,font,fontStyle,alignment,color,dx,dy
@@ -25,11 +23,14 @@ $styles = @{
 foreach ($row in $allSpecs){
     if ($dataCols.Contains($row.Name)){
         $drawCols.Add($row.Name, $row)
-        $st = $styles.Regular
-        if ($styles.Containskey($row.fontStyle)){
-            $st = $styles[$row.fontStyle]
+        $font = '{0}|{1}|{2}' -f $row.font,$row.fontSize,$row.fontStyle
+        if (-not $fonts.containskey($font)){
+            $st = $styles.Regular
+            if ($styles.Containskey($row.fontStyle)){
+                $st = $styles[$row.fontStyle]
+            }
+            $fonts.Add($font, [system.drawing.font]::new($row.Font,[int]$row.fontSize, $st,[system.drawing.graphicsunit]::Point))
         }
-        $fonts.Add($row.Name, [system.drawing.font]::new($row.Font,[int]$row.fontSize ?? 12, $st,[system.drawing.graphicsunit]::Point))
     }
 }
 #getting cols end
@@ -51,7 +52,7 @@ if ($folderSelector.ShowDialog() -eq 'OK'){
 } else {
     exit
 }
-
+$folderSelector.dispose()
 #drawing core
 $align = [system.drawing.stringformat]::new()
 foreach ($row in $data){
@@ -91,11 +92,12 @@ foreach ($row in $data){
             'center' {$align.alignment = 'Center'}
             'left' {$align.alignment = 'Near'}
             'right' {$align.alignment = 'Far'} 
-        } 
+        }
+        $font = '{0}|{1}|{2}' -f $col.Value.font,$col.Value.fontSize,$col.Value.fontStyle
         foreach ($v in $vals){
             $g.drawstring(
                 $v,
-                $fonts[$col.Key],
+                $fonts[$font],
                 [system.drawing.brushes]::($col.Value.Color),
                 $pos,
                 $align
@@ -111,3 +113,7 @@ foreach ($row in $data){
 if ($template){
     $template.Dispose()
 }
+foreach ($f in $fonts.Values){
+    $f.dispose()
+}
+$fonts.Clear()
