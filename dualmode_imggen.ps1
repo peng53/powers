@@ -1,15 +1,17 @@
 ﻿#Requires -Version 7
 add-type -AssemblyName 'system.drawing'
-add-type -AssemblyName 'system.windows.forms'
 
-Function ImgGen([string]$specfile
-    ,[string]$datafile
-    ,[string]$outpath
+Function ImgGen {
+    [CmdletBinding()]
+    param
+    ([Parameter(mandatory)][string]$specfile
+    ,[Parameter(mandatory)][string]$datafile
+    ,[Parameter(mandatory)][string]$outpath
     ,[bool]$clobber=$false
     ,[int]$width=1700
     ,[int]$height=600
     ,[string]$templateFile = 'template.png'
-){
+    )
     # specs should be csv with header
     # Name,x0,y0,fontSize,font,fontStyle,alignment,color,dx,dy
     $allSpecs = import-csv $specfile
